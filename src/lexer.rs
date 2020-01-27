@@ -141,7 +141,19 @@ impl<'a> Lexer<'a> {
 
       let location = self.pos;
 
-      if value == "+" {
+      if value == "(" {
+        self.pos += 1;
+        return Token {
+          location,
+          kind: TokenKind::LeftParen,
+        };
+      } else if value == ")" {
+        self.pos += 1;
+        return Token {
+          location,
+          kind: TokenKind::RightParen,
+        };
+      } else if value == "+" {
         self.pos += 1;
         return Token {
           location,
