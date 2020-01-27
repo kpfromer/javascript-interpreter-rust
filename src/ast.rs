@@ -9,6 +9,7 @@ pub struct Name {
 
 pub enum Expr {
   IntLit(u32),
+  Variable(String),
   UnaryAdd(Box<Expr>),
   UnarySub(Box<Expr>),
   Add(Box<Expr>, Box<Expr>),

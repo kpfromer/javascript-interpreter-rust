@@ -1,27 +1,39 @@
 extern crate unicode_segmentation;
 
+use std::collections::HashMap;
+use unicode_segmentation::UnicodeSegmentation;
+
 mod ast;
+mod callstack;
 mod lexer;
 mod parser;
 mod visitor;
 
 use ast::*;
+use callstack::*;
 use parser::*;
 use std::fs;
 use visitor::*;
 
-use unicode_segmentation::UnicodeSegmentation;
-
 fn main() {
     println!("Hello, world!");
-    let mut interpreter = Interpreter;
-    let one = Expr::IntLit(1);
-    let two = Expr::IntLit(2);
-    let add = Expr::Add(Box::new(one), Box::new(two));
-    println!("Int: {}", interpreter.visit_expr(&add));
+    let mut callstack = ActivationRecord {
+        name: String::from("global"),
+        level: 0,
+        parent: None,
+        records: HashMap::new(),
+    };
+
+    callstack.set(&String::from("a"), ActivationRecordValue::IntValue(10));
+
+    let mut interpreter = Interpreter { callstack };
+    // let one = Expr::IntLit(1);
+    // let two = Expr::IntLit(2);
+    // let add = Expr::Add(Box::new(one), Box::new(two));
+    // println!("Int: {}", interpreter.visit_expr(&add));
 
     let contents = fs::read_to_string("test.txt").expect("Something went wrong reading the file");
-    println!("Contents: {}", contents);
+    // println!("Contents: {}", contents);
 
     let fileContent = UnicodeSegmentation::graphemes(&contents[..], true).collect::<Vec<&str>>();
 

@@ -23,11 +23,12 @@ impl<'a> Parser<'a> {
   }
 
   // Expressions
-  // factor: IntegerConstant | Plus factor | Minus factor | LeftParen addSubFactor RightParen
+  // factor: IntegerConstant | Id | Plus factor | Minus factor | LeftParen addSubFactor RightParen
   pub fn factor(&mut self) -> Expr {
     let token = self.lexer.getNextToken();
     match token.kind {
       TokenKind::IntegerConstant(value) => Expr::IntLit(value),
+      TokenKind::Id(value) => Expr::Variable(value),
       TokenKind::Plus => Expr::UnaryAdd(Box::new(self.factor())),
       TokenKind::Minus => Expr::UnarySub(Box::new(self.factor())),
       TokenKind::LeftParen => {
