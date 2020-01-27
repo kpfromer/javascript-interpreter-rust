@@ -21,6 +21,8 @@ impl Visitor<i64> for Interpreter {
   fn visit_expr(&mut self, e: &Expr) -> i64 {
     match *e {
       Expr::IntLit(n) => n as i64,
+      Expr::UnaryAdd(ref item) => self.visit_expr(item) as i64,
+      Expr::UnarySub(ref item) => (-self.visit_expr(item)) as i64,
       Expr::Add(ref lhs, ref rhs) => (self.visit_expr(lhs) + self.visit_expr(rhs)) as i64,
       Expr::Sub(ref lhs, ref rhs) => (self.visit_expr(lhs) - self.visit_expr(rhs)) as i64,
       Expr::Multiply(ref lhs, ref rhs) => (self.visit_expr(lhs) * self.visit_expr(rhs)) as i64,

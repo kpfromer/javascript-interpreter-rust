@@ -70,31 +70,11 @@ impl<'a> Lexer<'a> {
   fn advance(&mut self) -> bool {
     self.pos += 1;
     return true;
-    // match self.lines.get(self.line) {
-    //   Some(line) => {
-    //     if self.pos + 1 < line.len() {
-    //       self.pos += 1;
-    //       return false;
-    //     } else {
-    //       self.line += 1;
-    //       self.pos = 0;
-    //       return true;
-    //     }
-    //   }
-    //   None => {
-    //     panic!();
-    //   }
-    // }
   }
   fn skipWhitespace(&mut self) {
     while *self.file.get(self.pos).expect("Expect value.") == " " {
       self.pos += 1;
     }
-    // if let Some(line) = self.lines.get(self.line) {
-    //   if line.as_bytes()[self.pos] == b' ' {
-    //     self.pos += 1;
-    //   }
-    // }
   }
   fn skipComment(&mut self) {
     while *self.file.get(self.pos).expect("Expect value.") != "}" {
@@ -102,8 +82,6 @@ impl<'a> Lexer<'a> {
     }
     self.pos += 1;
   }
-  // fn isEmpty(&self) -> bool {}
-
   pub fn _id(&mut self) -> Token {
     let location = self.pos;
 
