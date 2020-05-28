@@ -1,1 +1,6 @@
+let a = 100 * 2;
+let b = 3 * a;
+let c = true;
+let d = false;
+
 a * (4 / 2)

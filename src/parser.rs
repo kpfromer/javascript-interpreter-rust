@@ -28,6 +28,8 @@ impl<'a> Parser<'a> {
     let token = self.lexer.getNextToken();
     match token.kind {
       TokenKind::IntegerConstant(value) => Expr::IntLit(value),
+      TokenKind::True => Expr::BoolLit(true),
+      TokenKind::False => Expr::BoolLit(false),
       TokenKind::Id(value) => Expr::Variable(value),
       TokenKind::Plus => Expr::UnaryAdd(Box::new(self.factor())),
       TokenKind::Minus => Expr::UnarySub(Box::new(self.factor())),
@@ -38,7 +40,10 @@ impl<'a> Parser<'a> {
         }
         return fact;
       }
-      _ => panic!(),
+      unknown => {
+        println!("Unknown Token: {:?}", unknown);
+        panic!();
+      }
     }
   }
 
@@ -89,6 +94,28 @@ impl<'a> Parser<'a> {
   // Program Structure
 
   // Statements
+  pub fn name(&mut self) -> Name {
+    let token = self.lexer.getNextToken();
+    if let TokenKind::Id(value) = token.kind {
+      return Name { value };
+    }
+    println!("Invalid {:?}", token);
+    panic!();
+  }
+
+  // let NAME = EXPR ;
+  pub fn letStatement(&mut self) -> Stmt {
+    if let TokenKind::Id(value) = self.lexer.getNextToken().kind {
+      if value == "let" {
+        let name = self.name();
+        assert_eq!(self.lexer.getNextToken().kind, TokenKind::Equal);
+        let stmt = Stmt::Let(name, self.addSubFactor());
+        assert_eq!(self.lexer.getNextToken().kind, TokenKind::Semi);
+        return stmt;
+      }
+    }
+    panic!("let statement does not start with let");
+  }
 
   // Function/Procedure Setup
 }

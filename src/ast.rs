@@ -4,11 +4,12 @@ pub enum Stmt {
 }
 
 pub struct Name {
-  value: String,
+  pub value: String,
 }
 
 pub enum Expr {
   IntLit(u32),
+  BoolLit(bool),
   Variable(String),
   UnaryAdd(Box<Expr>),
   UnarySub(Box<Expr>),

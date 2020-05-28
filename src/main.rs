@@ -24,9 +24,12 @@ fn main() {
         records: HashMap::new(),
     };
 
-    callstack.set(&String::from("a"), ActivationRecordValue::IntValue(10));
+    callstack.set(String::from("a"), ActivationRecordValue::IntValue(10));
 
-    let mut interpreter = Interpreter { callstack };
+    let mut interpreter = Interpreter {
+        varName: None,
+        callstack,
+    };
     // let one = Expr::IntLit(1);
     // let two = Expr::IntLit(2);
     // let add = Expr::Add(Box::new(one), Box::new(two));
@@ -48,7 +51,15 @@ fn main() {
     // let num2 = Box::new(parser.number());
 
     // println!("Add {}", interpreter.visit_expr(&Expr::Add(num1, num2)));
-    println!("Add {}", interpreter.visit_expr(&parser.addSubFactor()));
+    // println!("Add {}", interpreter.visit_expr(&parser.addSubFactor()));
+    interpreter.visit_stmt(&parser.letStatement());
+    interpreter.visit_stmt(&parser.letStatement());
+    interpreter.visit_stmt(&parser.letStatement());
+    interpreter.visit_stmt(&parser.letStatement());
+
+    // interpreter is done running
+    callstack = interpreter.to_callstack();
+    println!("{}", callstack);
 
     // println!("Read value {:?}", lexer.peek(&1).expect("A token exists."));
 

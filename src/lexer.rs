@@ -99,12 +99,15 @@ impl<'a> Lexer<'a> {
       self.pos += 1;
     }
 
-    // TODO: reserved keywords
-
-    return Token {
-      kind: TokenKind::Id(result),
-      location,
+    let kind = match result.as_str() {
+      // reserved keywords
+      "true" => TokenKind::True,
+      "false" => TokenKind::False,
+      // not a reserved keyword
+      name => TokenKind::Id(String::from(name)),
     };
+
+    Token { kind, location }
   }
 
   pub fn getNextToken(&mut self) -> Token {
@@ -141,46 +144,23 @@ impl<'a> Lexer<'a> {
 
       let location = self.pos;
 
-      if value == "(" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::LeftParen,
-        };
-      } else if value == ")" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::RightParen,
-        };
-      } else if value == "+" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::Plus,
-        };
-      } else if value == "-" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::Minus,
-        };
-      } else if value == "*" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::Multiply,
-        };
-      } else if value == "/" {
-        self.pos += 1;
-        return Token {
-          location,
-          kind: TokenKind::Divide,
-        };
-      }
-
-      println!("Value: {}", value);
-      panic!();
+      // single char values
+      let kind = match value {
+        "(" => TokenKind::LeftParen,
+        ")" => TokenKind::RightParen,
+        "+" => TokenKind::Plus,
+        "-" => TokenKind::Minus,
+        "*" => TokenKind::Multiply,
+        "/" => TokenKind::Divide,
+        "=" => TokenKind::Equal,
+        ";" => TokenKind::Semi,
+        _ => {
+          println!("Invalid Value: {:?}", value);
+          panic!();
+        }
+      };
+      self.pos += 1;
+      return Token { location, kind };
     }
   }
   pub fn peek(&mut self, number: &i32) -> Result<Token, &'static str> {
