@@ -3,71 +3,64 @@ extern crate unicode_segmentation;
 use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
-mod ast;
+mod astold;
 mod callstack;
+mod errors;
 mod lexer;
 mod parser;
+mod result_visitor;
+mod runner;
 mod visitor;
 
-use ast::*;
+use astold::*;
 use callstack::*;
 use parser::*;
+use runner::*;
 use std::fs;
 use visitor::*;
 
+// testing
+use insta::assert_debug_snapshot;
 fn main() {
-    println!("Hello, world!");
-    let mut callstack = ActivationRecord {
-        name: String::from("global"),
-        level: 0,
-        parent: None,
-        records: HashMap::new(),
+    let runner = PascalRunner {
+        file: String::from("test.txt"),
     };
+    let callstack = runner.run();
+    println!("{}", callstack)
+}
 
-    callstack.set(String::from("a"), ActivationRecordValue::IntValue(10));
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let mut interpreter = Interpreter {
-        varName: None,
-        callstack,
-    };
-    // let one = Expr::IntLit(1);
-    // let two = Expr::IntLit(2);
-    // let add = Expr::Add(Box::new(one), Box::new(two));
-    // println!("Int: {}", interpreter.visit_expr(&add));
+    #[test]
+    fn test_interpreter_let_stmt() {
+        let contents = String::from("let a = 20; let b = 20 * 3;");
+        let file_content =
+            UnicodeSegmentation::graphemes(&contents[..], true).collect::<Vec<&str>>();
 
-    let contents = fs::read_to_string("test.txt").expect("Something went wrong reading the file");
-    // println!("Contents: {}", contents);
+        let lexer = lexer::Lexer {
+            file: file_content,
+            pos: 0,
+        };
+        let mut parser = Parser { lexer };
 
-    let fileContent = UnicodeSegmentation::graphemes(&contents[..], true).collect::<Vec<&str>>();
+        let mut callstack = ActivationRecord {
+            name: String::from("global"),
+            level: 0,
+            parent: None,
+            records: HashMap::new(),
+        };
+        callstack.set(String::from("a"), ActivationRecordValue::IntValue(10));
+        let mut interpreter = Interpreter {
+            varName: None,
+            callstack,
+        };
+        interpreter.visit_stmt(&parser.let_statement());
+        interpreter.visit_stmt(&parser.let_statement());
 
-    let mut lexer = lexer::Lexer {
-        file: fileContent,
-        pos: 0,
-    };
+        callstack = interpreter.to_callstack();
 
-    let mut parser = Parser { lexer };
-
-    // let num1 = Box::new(parser.number());
-    // let num2 = Box::new(parser.number());
-
-    // println!("Add {}", interpreter.visit_expr(&Expr::Add(num1, num2)));
-    // println!("Add {}", interpreter.visit_expr(&parser.addSubFactor()));
-    interpreter.visit_stmt(&parser.letStatement());
-    interpreter.visit_stmt(&parser.letStatement());
-    interpreter.visit_stmt(&parser.letStatement());
-    interpreter.visit_stmt(&parser.letStatement());
-
-    // interpreter is done running
-    callstack = interpreter.to_callstack();
-    println!("{}", callstack);
-
-    // println!("Read value {:?}", lexer.peek(&1).expect("A token exists."));
-
-    // loop {
-    //     let token = lexer.getNextToken();
-    //     println!("Read value {:?}", token);
-    //     if let lexer::TokenKind::EndOfFile = token.kind {
-    //         break;
-    //     }
-    // }
+        assert_debug_snapshot!(callstack);
+    }
 }

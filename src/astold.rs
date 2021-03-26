@@ -1,3 +1,8 @@
+// TODO: convert to function
+pub struct Body {
+  pub statements: Vec<Stmt>,
+}
+
 pub enum Stmt {
   Expr(Expr),
   Let(Name, Expr),

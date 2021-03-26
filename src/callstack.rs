@@ -1,17 +1,18 @@
 use std::collections::HashMap;
 
-#[derive(Debug)]
-pub enum ActivationRecordValue<INT> {
+#[derive(Debug, Clone)]
+pub enum ActivationRecordValue<NUMBER> {
   BooleanValue(bool),
-  IntValue(INT),
+  IntValue(NUMBER),
   // FunctionDecl();
 }
 
-pub struct ActivationRecord<INT> {
+#[derive(Debug)]
+pub struct ActivationRecord<NUMBER> {
   pub name: String,
   pub level: u32,
-  pub parent: Option<Box<ActivationRecord<INT>>>,
-  pub records: HashMap<String, ActivationRecordValue<INT>>, // type
+  pub parent: Option<Box<ActivationRecord<NUMBER>>>,
+  pub records: HashMap<String, ActivationRecordValue<NUMBER>>, // type
 }
 
 impl<INT> ActivationRecord<INT> {
